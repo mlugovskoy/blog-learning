@@ -6,8 +6,6 @@ import { Link, usePage } from '@inertiajs/vue3';
 defineProps<{
     items: NavItem[];
 }>();
-
-const page = usePage<SharedData>();
 </script>
 
 <template>
