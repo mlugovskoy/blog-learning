@@ -1,19 +1,21 @@
 <?php
 
+use App\Http\Resources\PostResource;
+use App\Models\Post;
 use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\get;
 
 it('should return the correct component', function () {
     get(route('posts.index'))
-        ->assertInertia(fn(Assert $inertia) => $inertia
-            ->component('posts/Index', true)
-        );
+        ->assertComponent('posts/Index');
 });
 
 it('passes posts to the view', function () {
+    $posts = Post::factory(3)->create();
+
+    $posts->load('user');
+
     get(route('posts.index'))
-        ->assertInertia(fn(Assert $inertia) => $inertia
-            ->has('posts')
-        );
+        ->assertHasPaginatedResource('posts', PostResource::collection($posts->reverse()));
 });

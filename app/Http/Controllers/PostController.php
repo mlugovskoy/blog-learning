@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return inertia("posts/Index", [
-            'posts' => Post::all()
+            'posts' => PostResource::collection(Post::query()->with('user')->latest()->latest('id')->paginate())
         ]);
     }
 
@@ -36,9 +34,13 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Post $post)
     {
-        //
+        $post->load('user');
+
+        return inertia('posts/Show', [
+            'post' => PostResource::make($post)
+        ]);
     }
 
     /**
