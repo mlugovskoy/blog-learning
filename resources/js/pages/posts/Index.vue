@@ -6,6 +6,7 @@ import Container from '@/components/Container.vue';
 import Pagination from '@/components/Pagination.vue';
 import { computed } from 'vue';
 import { formatDistance, parseISO } from 'date-fns';
+import { relativeDate } from '@/util/date';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 defineProps(['posts']);
 
 const formattedDate = (post) => {
-    return formatDistance(parseISO(post.created_at), new Date());
+    return relativeDate(post.created_at);
 };
 </script>
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostResource;
@@ -23,6 +24,12 @@ require __DIR__ . '/auth.php';
 
 Route::get('posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::resource('posts.comments', CommentController::class)
+        ->shallow()
+        ->only(['store', 'update', 'destroy']);
+});
 
 Route::get('test', function () {
     return [
