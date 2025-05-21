@@ -22,10 +22,11 @@ Route::get('dashboard', function () {
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
 
-Route::get('posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+Route::resource('posts', PostController::class)->only(['index', 'show', 'create']);
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::resource('posts', PostController::class)->only(['store']);
+
     Route::resource('posts.comments', CommentController::class)
         ->shallow()
         ->only(['store', 'update', 'destroy']);
