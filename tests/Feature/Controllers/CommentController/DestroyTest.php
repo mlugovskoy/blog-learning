@@ -26,7 +26,7 @@ it('redirects to the post show page', function () {
 
     actingAs($comment->user)
         ->delete(route('comments.destroy', $comment))
-        ->assertRedirect(route('posts.show', $comment->post_id));
+        ->assertRedirect($comment->post->showRoute());
 });
 
 it('prevents deleting a comment you didnt create', function () {

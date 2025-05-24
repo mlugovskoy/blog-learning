@@ -25,7 +25,7 @@ class CommentController extends Controller
 
         Session::flash('flash_message', 'Comment added');
 
-        return to_route('posts.show', $post);
+        return redirect($post->showRoute());
     }
 
     /**
@@ -41,7 +41,7 @@ class CommentController extends Controller
 
         Session::flash('flash_message', 'Comment update');
 
-        return to_route('posts.show', ['post' => $comment->post_id, 'page' => $request->query('page')]);
+        return redirect($comment->post->showRoute(['page' => $request->query('page')]));
     }
 
     /**
@@ -55,6 +55,6 @@ class CommentController extends Controller
 
         Session::flash('flash_message', 'Comment delete');
 
-        return to_route('posts.show', $comment->post_id);
+        return redirect($comment->post->showRoute(['page' => $request->query('page')]));
     }
 }

@@ -29,7 +29,7 @@ const formattedDate = (post) => {
         <Container>
             <ul class="divide-y">
                 <li v-for="post in posts.data" :key="post.id">
-                    <Link :href="route('posts.show', post.id)" class="group block px-2 py-4">
+                    <Link :href="post.routes.show" class="group block px-2 py-4">
                         <span class="font-bold text-sm transition-all group-hover:text-indigo-400">
                             {{ post.title }}
                         </span>

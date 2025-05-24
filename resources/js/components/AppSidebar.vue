@@ -21,13 +21,22 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: route('dashboard'),
         icon: LayoutGrid,
-        isActive: route().current('dashboard')
+        isActive: route().current('dashboard'),
+        show: true
     },
     {
         title: 'Posts',
         href: route('posts.index'),
         icon: LayoutGrid,
-        isActive: route().current('posts.index')
+        isActive: route().current('posts.index'),
+        show: true
+    },
+    {
+        title: 'Create a Post',
+        href: route('posts.create'),
+        icon: LayoutGrid,
+        isActive: route().current('posts.create'),
+        show: usePage().props.permissions.create_posts
     }
 ];
 

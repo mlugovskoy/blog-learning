@@ -14,6 +14,7 @@ defineProps<{
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
+                    v-if="item.show"
                     as-child :is-active="item.isActive"
                     :tooltip="item.title"
                 >

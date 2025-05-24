@@ -22,10 +22,8 @@ Route::get('dashboard', function () {
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
 
-Route::resource('posts', PostController::class)->only(['index', 'show', 'create']);
-
 Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::resource('posts', PostController::class)->only(['store']);
+    Route::resource('posts', PostController::class)->only(['store', 'create']);
 
     Route::resource('posts.comments', CommentController::class)
         ->shallow()
@@ -39,3 +37,7 @@ Route::get('test', function () {
         CommentResource::make(Comment::query()->find(1)),
     ];
 });
+
+Route::get('posts/{post}/{slug}', [PostController::class, 'show'])->name('posts.show');
+
+Route::resource('posts', PostController::class)->only(['index']);
