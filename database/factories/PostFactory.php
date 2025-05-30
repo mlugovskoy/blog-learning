@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use App\Support\PostFixtures;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -14,7 +15,6 @@ use SplFileInfo;
  */
 class PostFactory extends Factory
 {
-    private static Collection $fixtures;
 
     public function definition(): array
     {
@@ -30,19 +30,8 @@ class PostFactory extends Factory
 
     public function withFixture()
     {
-        $posts = static::getFixtures()
-            ->map(fn(string $contents) => str($contents)->explode("\n", 2))
-            ->map(fn(Collection $parts) => [
-                'title' => str($parts[0])->trim()->after('# '),
-                'body' => str($parts[1])->trim()
-            ]);
-
-        return $this->sequence(...$posts);
+        return $this->sequence(...PostFixtures::getFixtures());
     }
 
-    private function getFixtures(): Collection
-    {
-        return self::$fixtures ??= collect(File::files(database_path('factories/articles')))
-            ->map(fn(SplFileInfo $fileInfo) => $fileInfo->getContents());
-    }
+
 }

@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import InputError from '@/components/InputError.vue';
 import { TextArea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import MarkdownEditor from '@/components/MarkdownEditor.vue';
+import axios from 'axios';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,6 +25,19 @@ const form = useForm({
 });
 
 const createPost = () => form.post(route('posts.store'));
+
+const isInProduction = () => import.meta.env.PROD;
+
+const autofill = async () => {
+    if (isInProduction()) {
+        return;
+    }
+
+    const response = await axios.get('/local/post-content');
+
+    form.title = response.data.title;
+    form.body = response.data.body;
+};
 </script>
 
 <template>
@@ -39,7 +54,18 @@ const createPost = () => form.post(route('posts.store'));
 
                 <div class="mt-3">
                     <Label for="body" class="sr-only">Body</Label>
-                    <TextArea id="body" v-model="form.body" rows="25" />
+                    <MarkdownEditor v-model="form.body">
+                        <template #toolbar="{editor}">
+                            <li v-if="!isInProduction()">
+                                <button @click="autofill"
+                                        type="button"
+                                        title="Autofill"
+                                        class="px-3 py-2 shadow-xs transition-all">
+                                    <i class="ri-article-line"></i>
+                                </button>
+                            </li>
+                        </template>
+                    </MarkdownEditor>
                     <InputError :message="form.errors.title" class="mt-1" />
                 </div>
 

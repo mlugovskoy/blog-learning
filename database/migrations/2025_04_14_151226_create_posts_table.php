@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('title');
             $table->string('slug')->unique();
             $table->longText('body');
+            $table->longText('html');
             $table->timestamps();
         });
     }

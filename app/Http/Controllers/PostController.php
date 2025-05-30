@@ -37,12 +37,13 @@ class PostController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'min:10', 'max:120'],
-            'slug' => ['required', 'string', 'min:10', 'max:160'],
-            'body' => ['required', 'string', 'min:30', 'max:10000'],
+            'slug' => ['string', 'min:10', 'max:160'],
+            'body' => ['required', 'string', 'min:30', 'max:10000']
         ]);
 
         $post = Post::query()->create([
             ...$data,
+            'slug'=> Str::slug($data['title']),
             'user_id' => $request->user()->id,
         ]);
 

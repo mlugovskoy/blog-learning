@@ -9,6 +9,7 @@ const emit = defineEmits(['edit', 'delete']);
 <template>
     <div class="sm:flex px-2 py-4">
         <div class="sm:flex-auto">
+            <div class="markdown mt-1 prose prose-sm max-w-none" v-html="comment.html"></div>
             <p class="text-sm break-all">{{ comment.body }}</p>
             <span class="first-letter:uppercase block text-sm pt-1 text-neutral-400">
                 By {{ comment.user.name }} {{ relativeDate(comment.created_at) }} before
@@ -24,3 +25,14 @@ const emit = defineEmits(['edit', 'delete']);
         </div>
     </div>
 </template>
+
+<style>
+.markdown strong,
+.markdown blockquote,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown a {
+    color: white;
+}
+</style>

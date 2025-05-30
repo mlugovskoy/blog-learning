@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { router, useForm } from '@inertiajs/vue3';
 import { TextArea } from '@/components/ui/textarea';
 import InputError from '@/components/InputError.vue';
+import MarkdownEditor from '@/components/MarkdownEditor.vue';
 
 const props = defineProps(['post', 'comments']);
 
@@ -49,11 +50,13 @@ const deleteComment = (commentId) => {
     });
 }
 
+const commentTextAreaRef = ref(null);
 const commentIdBeingEdited = ref(null);
 const commentBeingEdit = computed(() => props.comments.data.find(comment => comment.id === commentIdBeingEdited.value));
 const editComment = (commentId) => {
     commentIdBeingEdited.value = commentId;
     commentForm.body = commentBeingEdit.value?.body;
+    commentTextAreaRef.value?.focus();
 };
 
 const cancelEditComment = () => {
@@ -75,9 +78,7 @@ const updateComment = () => commentForm.put(route('comments.update', {
         <Container>
             <h1 class="text-2xl font-bold">{{ post.title }}</h1>
             <span class="text-sm text-neutral-400 block">{{ formattedDate }} ago by {{ post.user.name }}</span>
-            <article class="mt-6">
-                <pre class="whitespace-pre-wrap font-sans">{{ post.body }}</pre>
-            </article>
+            <article class="markdown mt-6 prose prose-sm max-w-none text-white" v-html="post.html"></article>
 
             <div class="mt-12">
                 <h2 class="text-xl font-semibold">Comments</h2>
@@ -86,8 +87,8 @@ const updateComment = () => commentForm.put(route('comments.update', {
                       @submit.prevent="() => commentIdBeingEdited ? updateComment() : addComment()">
                     <div class="mt-3">
                         <Label class="sr-only" for="body">Comment</Label>
-                        <TextArea id="body" v-model="commentForm.body"
-                                  placeholder="Speak your mind Spock..."></TextArea>
+                        <MarkdownEditor ref="commentTextAreaRef" editorClass="min-h-[160px]" id="body" v-model="commentForm.body"
+                                  placeholder="Speak your mind Spock..."></MarkdownEditor>
                         <InputError class="mt-1" :message="commentForm.errors.body" />
                     </div>
 
@@ -107,6 +108,13 @@ const updateComment = () => commentForm.put(route('comments.update', {
     </AppLayout>
 </template>
 
-<style scoped>
-
+<style>
+.markdown strong,
+.markdown blockquote,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown a {
+    color: white;
+}
 </style>
