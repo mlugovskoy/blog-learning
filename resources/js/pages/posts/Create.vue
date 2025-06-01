@@ -11,6 +11,7 @@ import { TextArea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import axios from 'axios';
+import PageHeading from '@/components/PageHeading.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,9 +20,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
+const props = defineProps(['topics']);
+
 const form = useForm({
     title: '',
-    body: ''
+    body: '',
+    topic_id: props.topics[0].id
 });
 
 const createPost = () => form.post(route('posts.store'));
@@ -43,13 +47,23 @@ const autofill = async () => {
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container>
-            <h1 class="text-2xl font-bold">Create a Post</h1>
+            <PageHeading>Create a Post</PageHeading>
 
             <form @submit.prevent="createPost" class="mt-6">
                 <div>
                     <Label for="title" class="sr-only">Title</Label>
                     <Input id="title" class="w-full" v-model="form.title" placeholder="Give it a great title..." />
                     <InputError :message="form.errors.title" class="mt-1" />
+                </div>
+
+                <div class="mt-3">
+                    <Label for="topic_id" class="mb-1">Select a Topic</Label>
+                    <select v-model="form.topic_id" id="topic_id" class="border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm">
+                        <option v-for="topic in topics" :key="topic.id" :value="topic.id" class="text-primary-foreground">
+                            {{ topic.name }}
+                        </option>
+                    </select>
+                    <InputError :message="form.errors.topic_id" class="mt-1" />
                 </div>
 
                 <div class="mt-3">

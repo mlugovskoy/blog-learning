@@ -4,19 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CommentResource;
 use App\Http\Resources\PostResource;
+use App\Http\Resources\TopicResource;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Topic;
 use App\Policies\PostPolicy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Topic $topic = null)
     {
+        $posts = Post::query()
+            ->with(['user', 'topic'])
+            ->when($topic, fn(Builder $query) => $query->whereBelongsTo($topic))
+            ->latest()
+            ->latest('id')
+            ->paginate();
+
         return inertia("posts/Index", [
-            'posts' => PostResource::collection(Post::query()->with('user')->latest()->latest('id')->paginate())
+            'posts' => PostResource::collection($posts),
+            'topics' => fn() => TopicResource::collection(Topic::all()),
+            'selectedTopic' => fn() => $topic ? TopicResource::make($topic) : null,
         ]);
     }
 
@@ -27,7 +39,9 @@ class PostController extends Controller
     {
         Gate::authorize('create', Post::class);
 
-        return inertia("posts/Create");
+        return inertia("posts/Create", [
+            'topics' => fn() => TopicResource::collection(Topic::all()),
+        ]);
     }
 
     /**
@@ -38,12 +52,13 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'min:10', 'max:120'],
             'slug' => ['string', 'min:10', 'max:160'],
+            'topic_id' => ['required', 'exists:topics,id'],
             'body' => ['required', 'string', 'min:30', 'max:10000']
         ]);
 
         $post = Post::query()->create([
             ...$data,
-            'slug'=> Str::slug($data['title']),
+            'slug' => Str::slug($data['title']),
             'user_id' => $request->user()->id,
         ]);
 
@@ -61,7 +76,7 @@ class PostController extends Controller
             return redirect($post->showRoute($request->query()));
         }
 
-        $post->load('user');
+        $post->load(['user', 'topic']);
 
         return inertia('posts/Show', [
             'post' => fn() => PostResource::make($post),

@@ -14,6 +14,8 @@ import { router, useForm } from '@inertiajs/vue3';
 import { TextArea } from '@/components/ui/textarea';
 import InputError from '@/components/InputError.vue';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
+import PageHeading from '@/components/PageHeading.vue';
+import Pill from '@/components/Pill.vue';
 
 const props = defineProps(['post', 'comments']);
 
@@ -48,7 +50,7 @@ const deleteComment = (commentId) => {
     }), {
         preserveScroll: true
     });
-}
+};
 
 const commentTextAreaRef = ref(null);
 const commentIdBeingEdited = ref(null);
@@ -76,7 +78,10 @@ const updateComment = () => commentForm.put(route('comments.update', {
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container>
-            <h1 class="text-2xl font-bold">{{ post.title }}</h1>
+            <div>
+                <Pill :href="route('posts.index', {topic: post.topic.slug})">{{ post.topic.name}}</Pill>
+            </div>
+            <PageHeading class="mt-2">{{ post.title }}</PageHeading>
             <span class="text-sm text-neutral-400 block">{{ formattedDate }} ago by {{ post.user.name }}</span>
             <article class="markdown mt-6 prose prose-sm max-w-none text-white" v-html="post.html"></article>
 
@@ -87,8 +92,9 @@ const updateComment = () => commentForm.put(route('comments.update', {
                       @submit.prevent="() => commentIdBeingEdited ? updateComment() : addComment()">
                     <div class="mt-3">
                         <Label class="sr-only" for="body">Comment</Label>
-                        <MarkdownEditor ref="commentTextAreaRef" editorClass="min-h-[160px]" id="body" v-model="commentForm.body"
-                                  placeholder="Speak your mind Spock..."></MarkdownEditor>
+                        <MarkdownEditor ref="commentTextAreaRef" editorClass="min-h-[160px]" id="body"
+                                        v-model="commentForm.body"
+                                        placeholder="Speak your mind Spock..."></MarkdownEditor>
                         <InputError class="mt-1" :message="commentForm.errors.body" />
                     </div>
 

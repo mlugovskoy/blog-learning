@@ -7,6 +7,8 @@ import Pagination from '@/components/Pagination.vue';
 import { computed } from 'vue';
 import { formatDistance, parseISO } from 'date-fns';
 import { relativeDate } from '@/util/date';
+import PageHeading from '@/components/PageHeading.vue';
+import Pill from '@/components/Pill.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     }
 ];
 
-defineProps(['posts']);
+defineProps(['posts', 'topics', 'selectedTopic']);
 
 const formattedDate = (post) => {
     return relativeDate(post.created_at);
@@ -27,8 +29,19 @@ const formattedDate = (post) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container>
-            <ul class="divide-y">
-                <li v-for="post in posts.data" :key="post.id">
+            <div>
+                <PageHeading v-text="selectedTopic ? selectedTopic.name : 'All posts'" />
+                <p v-if="selectedTopic" class="mt-1 text-neutral-400 text-sm">{{ selectedTopic.description }}</p>
+                <menu class="flex space-x-1 mt-4 overflow-x-auto pb-2 pt-1">
+                    <li><Pill :href="route('posts.index')">All Posts</Pill></li>
+                    <li v-for="topic in topics" :key="topic.id">
+                        <Pill :filled="topic.id === selectedTopic?.id" :href="route('posts.index', {topic: topic.slug})">{{ topic.name }}</Pill>
+                    </li>
+                </menu>
+            </div>
+            <ul class="divide-y mt-4">
+                <li v-for="post in posts.data" :key="post.id"
+                    class="flex justify-between items-baseline flex-col md:flex-row">
                     <Link :href="post.routes.show" class="group block px-2 py-4">
                         <span class="font-bold text-sm transition-all group-hover:text-indigo-400">
                             {{ post.title }}
@@ -37,6 +50,7 @@ const formattedDate = (post) => {
                             {{ formattedDate(post) }} ago by {{ post.user.name }}
                         </span>
                     </Link>
+                    <Pill :href="route('posts.index', {topic: post.topic.slug})">{{ post.topic.name }}</Pill>
                 </li>
             </ul>
             <Pagination :meta="posts.meta" />
