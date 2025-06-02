@@ -3,18 +3,17 @@
 import { Editor, EditorContent, useEditor } from '@tiptap/vue-3';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Link } from '@tiptap/extension-link';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { Markdown } from 'tiptap-markdown';
 import 'remixicon/fonts/remixicon.css';
 import { Placeholder } from '@tiptap/extension-placeholder';
 
 const props = defineProps({
-    modelValue: '',
     editorClass: '',
     placeholder: null
 });
 
-const emit = defineEmits(['update:modelValue']);
+const model = defineModel();
 
 const editor = useEditor({
     extensions: [
@@ -36,18 +35,21 @@ const editor = useEditor({
             class: `prose prose-sm max-w-none text-white ${props.editorClass ? props.editorClass : 'min-h-[200px]'}`
         }
     },
-    onUpdate: () => emit('update:modelValue', editor.value?.storage.markdown.getMarkdown())
+    onUpdate: () => model.value = editor.value?.storage.markdown.getMarkdown()
 }) as Editor;
 
 defineExpose({focus: () => editor.value?.commands.focus()});
 
-watch(() => props.modelValue, (value) => {
-    if (value === editor.value?.storage.markdown.getMarkdown()) {
-        return;
-    }
 
-    editor.value?.commands.setContent(value);
-}, { immediate: true });
+onMounted(() => {
+    watch(model, (value) => {
+        if (value === editor.value?.storage.markdown.getMarkdown()) {
+            return;
+        }
+
+        editor.value?.commands.setContent(value);
+    }, { immediate: true });
+})
 
 const promptUserForHref = () => {
     if (editor.value?.isActive('link')) {
