@@ -16,6 +16,8 @@ import InputError from '@/components/InputError.vue';
 import MarkdownEditor from '@/components/MarkdownEditor.vue';
 import PageHeading from '@/components/PageHeading.vue';
 import Pill from '@/components/Pill.vue';
+import { Link } from '@inertiajs/vue3';
+import { HandThumbUpIcon, HandThumbDownIcon } from '@heroicons/vue/20/solid';
 
 const props = defineProps(['post', 'comments']);
 
@@ -81,10 +83,32 @@ const updateComment = () => commentForm.put(route('comments.update', {
     <AppLayout :breadcrumbs="breadcrumbs">
         <Container>
             <div>
-                <Pill :href="route('posts.index', {topic: post.topic.slug})">{{ post.topic.name}}</Pill>
+                <Pill :href="route('posts.index', {topic: post.topic.slug})">{{ post.topic.name }}</Pill>
             </div>
             <PageHeading class="mt-2">{{ post.title }}</PageHeading>
             <span class="text-sm text-neutral-400 block">{{ formattedDate }} ago by {{ post.user.name }}</span>
+
+            <div class="mt-4">
+                <span class="text-pink-500 font-bold">{{ post.likes_count }} likes</span>
+
+                <div class="mt-2" v-if="$page.props.auth.user">
+                    <Link
+                        v-if="post.can.like"
+                        class="cursor-pointer inline-block bg-indigo-600 hover:bg-pink-500 transition-colors text-white py-1.5 px-3 rounded-full"
+                        :href="route('likes.store', ['post', post.id])" method="post">
+                        <HandThumbUpIcon class="size-4 inline-block mr-1" />
+                        Like Post
+                    </Link>
+                    <Link
+                        v-else
+                        class="cursor-pointer inline-block bg-indigo-600 hover:bg-pink-500 transition-colors text-white py-1.5 px-3 rounded-full"
+                        :href="route('likes.destroy', ['post', post.id])" method="delete">
+                        <HandThumbDownIcon class="size-4 inline-block mr-1" />
+                        Unlike Post
+                    </Link>
+                </div>
+            </div>
+
             <article class="markdown mt-6 prose prose-sm max-w-none text-white" v-html="post.html"></article>
 
             <div class="mt-12">
