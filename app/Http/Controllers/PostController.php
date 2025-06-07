@@ -16,26 +16,33 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function index(Topic $topic = null)
+    public function index(Request $request, Topic $topic = null)
     {
-        $posts = Post::query()
-            ->with(['user', 'topic'])
-            ->when($topic, fn(Builder $query) => $query->whereBelongsTo($topic))
-            ->latest()
-            ->latest('id')
-            ->paginate();
+        if ($request->query('query')) {
+            $posts = Post::search($request->query('query'))
+                ->query(fn(Builder $query) => $query->with(['user', 'topic']))
+                ->when($topic, fn(\Laravel\Scout\Builder $query) => $query->where('topic_id', $topic->id));
+        } else {
+            $posts = Post::query()
+                ->with(['user', 'topic'])
+                ->when($topic, fn(Builder $query) => $query->whereBelongsTo($topic))
+                ->latest()
+                ->latest('id');
+        }
 
         return inertia("posts/Index", [
-            'posts' => PostResource::collection($posts),
+            'posts' => PostResource::collection($posts->paginate()->withQueryString()),
             'topics' => fn() => TopicResource::collection(Topic::all()),
             'selectedTopic' => fn() => $topic ? TopicResource::make($topic) : null,
+            'query' => $request->query('query'),
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public
+    function create()
     {
         Gate::authorize('create', Post::class);
 
@@ -47,8 +54,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public
+    function store(
+        Request $request
+    ) {
         $data = $request->validate([
             'title' => ['required', 'string', 'min:10', 'max:120'],
             'slug' => ['string', 'min:10', 'max:160'],
@@ -70,8 +79,11 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Post $post)
-    {
+    public
+    function show(
+        Request $request,
+        Post $post
+    ) {
         if (!Str::endsWith($post->showRoute(), $request->path())) {
             return redirect($post->showRoute($request->query()));
         }
@@ -95,24 +107,31 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
+    public
+    function edit(
+        string $id
+    ) {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
+    public
+    function update(
+        Request $request,
+        string $id
+    ) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
+    public
+    function destroy(
+        string $id
+    ) {
         //
     }
 }

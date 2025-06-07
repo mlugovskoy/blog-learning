@@ -32,8 +32,12 @@ it('passes a comments to the view', function () {
 
     $comments->load('user');
 
+    $expectedResource = CommentResource::collection($comments->reverse());
+
+    $expectedResource->collection->transform(fn(CommentResource $resource) => $resource->withLikePermission());
+
     get($post->showRoute())
-        ->assertHasPaginatedResource('comments', CommentResource::collection($comments->reverse()));
+        ->assertHasPaginatedResource('comments', $expectedResource);
 });
 
 it('will redirect if the slug is incorrect', function (string $incorrectSlug) {

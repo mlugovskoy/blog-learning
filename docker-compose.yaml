@@ -36,3 +36,14 @@ services:
       - "1025:1025"
       - "8025:8025"
     container_name: app_mailhoog
+
+  meilisearch:
+    image: 'getmeili/meilisearch:v1.14.0'
+    environment:
+      MEILI_MASTER_KEY: '${MEILISEARCH_KEY}'
+    ports:
+      - '7720:7700'
+    healthcheck:
+      test: set -o pipefail;curl -fsS http://localhost:7700/health | grep -q '{"status":"available"}'
+      retries: 3
+      timeout: 5s
