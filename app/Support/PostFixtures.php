@@ -10,7 +10,7 @@ class PostFixtures
 {
     public static function getFixtures(): Collection
     {
-        return once(fn () => collect(File::files(database_path('factories/articles')))
+        return once(fn() => collect(File::files(database_path('factories/articles')))
             ->map(fn(SplFileInfo $fileInfo) => $fileInfo->getContents())
             ->map(fn(string $contents) => str($contents)->explode("\n", 2))
             ->map(fn(Collection $parts) => [

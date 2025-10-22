@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Gate;
 
 class LikeController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, string $type, int $id)
     {
         $likeable = $this->findLikeable($type, $id);
@@ -29,9 +26,6 @@ class LikeController extends Controller
         return back();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, string $type, int $id)
     {
         $likeable = $this->findLikeable($type, $id);

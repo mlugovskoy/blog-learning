@@ -38,11 +38,7 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public
-    function create()
+    public function create()
     {
         Gate::authorize('create', Post::class);
 
@@ -51,13 +47,8 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public
-    function store(
-        Request $request
-    ) {
+    public function store(Request $request)
+    {
         $data = $request->validate([
             'title' => ['required', 'string', 'min:10', 'max:120'],
             'slug' => ['string', 'min:10', 'max:160'],
@@ -76,14 +67,8 @@ class PostController extends Controller
         return redirect($post->showRoute());
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public
-    function show(
-        Request $request,
-        Post $post
-    ) {
+    public function show(Request $request, Post $post)
+    {
         if (!Str::endsWith($post->showRoute(), $request->path())) {
             return redirect($post->showRoute($request->query()));
         }
@@ -102,36 +87,5 @@ class PostController extends Controller
                 return $commentResource;
             }
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public
-    function edit(
-        string $id
-    ) {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public
-    function update(
-        Request $request,
-        string $id
-    ) {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public
-    function destroy(
-        string $id
-    ) {
-        //
     }
 }

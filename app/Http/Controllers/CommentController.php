@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Session;
 
 class CommentController extends Controller
 {
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request, Post $post)
     {
         $data = $request->validate(['body' => ['required', 'string', 'max:2500']]);
@@ -28,9 +25,6 @@ class CommentController extends Controller
         return redirect($post->showRoute());
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Comment $comment)
     {
         Gate::authorize('update', $comment);
@@ -44,9 +38,6 @@ class CommentController extends Controller
         return redirect($comment->post->showRoute(['page' => $request->query('page')]));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Comment $comment)
     {
         Gate::authorize('delete', $comment);
